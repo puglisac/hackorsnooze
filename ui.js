@@ -11,6 +11,7 @@ $(async function() {
 	const $newStoryForm = $("#story-form");
 	const $newStory = $("#new-story");
 	const $favs = $("#favorited-articles");
+	const $articles = $(".articles-container");
 
 	// global storyList variable
 	let storyList = null;
@@ -154,17 +155,21 @@ $(async function() {
 	}
 
 	//show user favorites
-	$("#favoritesBtn").on("click", function generateFavs() {
-		User.getLoggedInUser(currentUser.token, currentUser.username);
-		const userFavs = currentUser.favorites;
+	$("#favoritesBtn").on("click", function() {
+		generateFavs();
 		$favs.toggle();
+	});
+
+	//generate favorites
+	function generateFavs() {
+		//User.getLoggedInUser(currentUser.token, currentUser.username);
+		const userFavs = currentUser.favorites;
 		$favs.empty();
 		for (let favs of userFavs) {
 			const result = generateStoryHTML(favs);
 			$favs.append(result);
 		}
-	});
-
+	}
 	/**
    * A function to render HTML for an individual Story instance
    */
@@ -179,6 +184,7 @@ $(async function() {
         <a class="article-link" href="${story.url}" target="a_blank">
           <strong>${story.title}</strong>
         </a>
+        <button class="delete-btn"><i class="fa fa-trash" aria-hidden="true"></i></button>
         <small class="article-author">by ${story.author}</small>
         <small class="article-hostname ${hostName}">(${hostName})</small>
         <div class="flexbox">
@@ -187,6 +193,7 @@ $(async function() {
 	        </div>
         </div>
         <small class="article-username">posted by ${story.username}</small>
+
       </li>
 
     `);
@@ -235,6 +242,7 @@ $(async function() {
 		if (currentUser) {
 			localStorage.setItem("token", currentUser.loginToken);
 			localStorage.setItem("username", currentUser.username);
+			//localStorage.setItem("favorites", currentUser.favorites);
 		}
 	}
 	$newStoryForm.on("submit", async function createNewStory(event) {
@@ -242,19 +250,20 @@ $(async function() {
 		const story = { title: $("#story-title").val(), url: $("#story-url").val() };
 		await StoryList.addStory(currentUser, story);
 	});
-	const favBtn = $(".flexbox");
-	favBtn.on("click", async function(event) {
+
+	$articles.on("click", ".flexbox", async function(event) {
 		console.log(event);
 
 		const postID = $(event.target).closest("li").attr("id");
 		const isFav = checkFav(currentUser.favorites, postID);
 		if (isFav) {
-			$(event.target).removeClass("active");
 			await User.removeFavorite(currentUser, postID);
 		} else {
-			$(event.target).addClass("active");
 			await User.addFavorite(currentUser, postID);
 		}
+
+		await checkIfLoggedIn();
+		generateFavs();
 	});
 
 	function checkFav(obj, id) {
@@ -266,4 +275,9 @@ $(async function() {
 		}
 		return isFav;
 	}
+
+	$articles.on("click", ".delete-btn", async function(event) {
+		const postID = $(event.target).closest("li").attr("id");
+		await deleteStory(currentUser.loginToken, postID);
+	});
 });

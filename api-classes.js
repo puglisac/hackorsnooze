@@ -166,17 +166,22 @@ class User {
 	}
 	//user favorite
 	static async addFavorite(user, storyID) {
-		await axios.post(`https://hack-or-snooze-v3.herokuapp.com/users/${user.username}/favorites/${storyID}`, {
-			token: user.loginToken
-		});
-		//return response;
+		const response = await axios.post(
+			`https://hack-or-snooze-v3.herokuapp.com/users/${user.username}/favorites/${storyID}`,
+			{
+				token: user.loginToken
+			}
+		);
+		alert(response.data.message);
 	}
 	static async removeFavorite(user, storyID) {
-		console.log("user: " + user.username + " token: " + user.loginToken + " storyID: " + storyID);
-		await axios.delete(`https://hack-or-snooze-v3.herokuapp.com/users/${user.username}/favorites/${storyID}`, {
-			params: { token: user.loginToken }
-		});
-		//return response;
+		const response = await axios.delete(
+			`https://hack-or-snooze-v3.herokuapp.com/users/${user.username}/favorites/${storyID}`,
+			{
+				params: { token: user.loginToken }
+			}
+		);
+		alert(response.data.message);
 	}
 }
 
@@ -198,5 +203,15 @@ class Story {
 		this.storyId = storyObj.storyId;
 		this.createdAt = storyObj.createdAt;
 		this.updatedAt = storyObj.updatedAt;
+	}
+}
+async function deleteStory(token, storyID) {
+	try {
+		const response = await axios.delete(`${BASE_URL}/stories/${storyID}`, {
+			params: { token: token }
+		});
+		alert(response.data.message);
+	} catch (err) {
+		alert("Unable to delete this post");
 	}
 }

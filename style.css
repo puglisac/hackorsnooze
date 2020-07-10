@@ -294,6 +294,12 @@ body {
 	color: #cbcdce;
 	margin: 0;
 }
-.favme.active {
-	color: #dc3232;
+.delete-btn {
+	float: right;
+	background-color: #dc3232;
+	color: white;
+	border-radius: 3px;
+}
+.delete-btn:hover {
+	cursor: pointer;
 }
