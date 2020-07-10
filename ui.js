@@ -245,8 +245,10 @@ $(async function() {
 	const favBtn = $(".flexbox");
 	favBtn.on("click", async function(event) {
 		console.log(event);
+
 		const postID = $(event.target).closest("li").attr("id");
-		if ($(event.target).hasClass("active")) {
+		const isFav = checkFav(currentUser.favorites, postID);
+		if (isFav) {
 			$(event.target).removeClass("active");
 			await User.removeFavorite(currentUser, postID);
 		} else {
@@ -254,4 +256,14 @@ $(async function() {
 			await User.addFavorite(currentUser, postID);
 		}
 	});
+
+	function checkFav(obj, id) {
+		let isFav = false;
+		for (object of obj) {
+			if (object.storyId == id) {
+				isFav = true;
+			}
+		}
+		return isFav;
+	}
 });
