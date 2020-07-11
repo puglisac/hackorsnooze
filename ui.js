@@ -150,6 +150,14 @@ $(async function() {
 		// loop through all of our stories and generate HTML for them
 		for (let story of storyList.stories) {
 			const result = generateStoryHTML(story);
+			const isFave = checkFav(currentUser.favorites, story.storyId);
+			if (isFave) {
+				result.find("span").addClass("active");
+			}
+			console.log(story.username + currentUser.username);
+			if (story.username == currentUser.username) {
+				result.find("button").removeClass("hidden");
+			}
 			$allStoriesList.append(result);
 		}
 	}
@@ -162,7 +170,6 @@ $(async function() {
 
 	//generate favorites
 	function generateFavs() {
-		//User.getLoggedInUser(currentUser.token, currentUser.username);
 		const userFavs = currentUser.favorites;
 		$favs.empty();
 		for (let favs of userFavs) {
@@ -184,7 +191,7 @@ $(async function() {
         <a class="article-link" href="${story.url}" target="a_blank">
           <strong>${story.title}</strong>
         </a>
-        <button class="delete-btn"><i class="fa fa-trash" aria-hidden="true"></i></button>
+        <button class="delete-btn hidden"><i class="fa fa-trash" aria-hidden="true"></i></button>
         <small class="article-author">by ${story.author}</small>
         <small class="article-hostname ${hostName}">(${hostName})</small>
         <div class="flexbox">
@@ -249,6 +256,7 @@ $(async function() {
 		event.preventDefault();
 		const story = { title: $("#story-title").val(), url: $("#story-url").val() };
 		await StoryList.addStory(currentUser, story);
+		await checkIfLoggedIn();
 	});
 
 	$articles.on("click", ".flexbox", async function(event) {
@@ -279,5 +287,6 @@ $(async function() {
 	$articles.on("click", ".delete-btn", async function(event) {
 		const postID = $(event.target).closest("li").attr("id");
 		await deleteStory(currentUser.loginToken, postID);
+		await checkIfLoggedIn();
 	});
 });

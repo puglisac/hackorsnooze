@@ -294,6 +294,10 @@ body {
 	color: #cbcdce;
 	margin: 0;
 }
+.active,
+#favorited-articles span {
+	color: red;
+}
 .delete-btn {
 	float: right;
 	background-color: #dc3232;
