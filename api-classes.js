@@ -50,7 +50,7 @@ class StoryList {
 		const reqObj = {
 			token: user.loginToken,
 			story: {
-				author: user.name,
+				author: newStory.author,
 				title: newStory.title,
 				url: newStory.url
 			}

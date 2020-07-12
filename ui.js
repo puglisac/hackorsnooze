@@ -8,7 +8,7 @@ $(async function() {
 	const $ownStories = $("#my-articles");
 	const $navLogin = $("#nav-login");
 	const $navLogOut = $("#nav-logout");
-	const $newStoryForm = $("#story-form");
+	const $newStoryForm = $("#submit-form");
 	const $newStory = $("#new-story");
 	const $favs = $("#favorited-articles");
 	const $articles = $(".articles-container");
@@ -81,6 +81,11 @@ $(async function() {
 		$loginForm.slideToggle();
 		$createAccountForm.slideToggle();
 		$allStoriesList.toggle();
+	});
+	$("#new-story-btn").on("click", function() {
+		console.log("clicked");
+		// Show the Login and Create Account Forms
+		$newStoryForm.slideToggle();
 	});
 
 	/**
@@ -171,6 +176,7 @@ $(async function() {
 	$("#favoritesBtn").on("click", function() {
 		generateFavs();
 		$favs.toggle();
+		$allStoriesList.toggle();
 	});
 
 	//generate favorites
@@ -179,6 +185,10 @@ $(async function() {
 		$favs.empty();
 		for (let favs of userFavs) {
 			const result = generateStoryHTML(favs);
+			//adds delet icon to user's posts
+			if (favs.username == currentUser.username) {
+				result.find("button").removeClass("hidden");
+			}
 			$favs.append(result);
 		}
 	}
@@ -231,6 +241,8 @@ $(async function() {
 		$navLogin.hide();
 		$navLogOut.show();
 		$newStory.show();
+		$("#favoritesBtn").show();
+		$("#new-story-btn").show();
 	}
 
 	/* simple function to pull the hostname from a URL */
@@ -259,7 +271,8 @@ $(async function() {
 	//creates a new story
 	$newStoryForm.on("submit", async function createNewStory(event) {
 		event.preventDefault();
-		const story = { title: $("#story-title").val(), url: $("#story-url").val() };
+		const story = { author: $("#author").val(), title: $("#title").val(), url: $("#url").val() };
+		console.log(story);
 		await StoryList.addStory(currentUser, story);
 		await checkIfLoggedIn();
 	});
@@ -291,6 +304,7 @@ $(async function() {
 		const postID = $(event.target).closest("li").attr("id");
 		await deleteStory(currentUser.loginToken, postID);
 		await checkIfLoggedIn();
+		generateFavs();
 	});
 
 	$("#profile-name").text(`Name: ${currentUser.name}`);
