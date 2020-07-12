@@ -83,7 +83,6 @@ $(async function() {
 		$allStoriesList.toggle();
 	});
 	$("#new-story-btn").on("click", function() {
-		console.log("clicked");
 		// Show the Login and Create Account Forms
 		$newStoryForm.slideToggle();
 	});
@@ -137,6 +136,7 @@ $(async function() {
 
 		// update the navigation bar
 		showNavForLoggedInUser();
+		generateStories();
 	}
 
 	/**
