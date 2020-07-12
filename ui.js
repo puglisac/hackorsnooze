@@ -286,16 +286,20 @@ $(async function() {
 	//adds or removes favorites
 	$articles.on("click", ".flexbox", async function(event) {
 		const postID = $(event.target).closest("li").attr("id");
-		const isFav = checkFav(currentUser.favorites, postID);
-		if (isFav) {
-			await User.removeFavorite(currentUser, postID);
-		} else {
-			await User.addFavorite(currentUser, postID);
-		}
 
-		await checkIfLoggedIn();
-		generateFavs();
-		generateMyStories();
+		try {
+			const isFav = checkFav(currentUser.favorites, postID);
+			if (isFav) {
+				await User.removeFavorite(currentUser, postID);
+			} else {
+				await User.addFavorite(currentUser, postID);
+			}
+			await checkIfLoggedIn();
+			generateFavs();
+			generateMyStories();
+		} catch (error) {
+			alert("You must be logged in to add to favorites");
+		}
 	});
 	//check story against user favorites
 	function checkFav(obj, id) {
