@@ -55,9 +55,7 @@ class StoryList {
 				url: newStory.url
 			}
 		};
-		console.log(reqObj);
 		const response = await axios.post(`${BASE_URL}/stories`, reqObj);
-		console.log(response);
 		const addedStory = new Story(response.data.story);
 		const newStoryList = new StoryList(addedStory);
 		return newStoryList;
@@ -205,13 +203,10 @@ class Story {
 		this.updatedAt = storyObj.updatedAt;
 	}
 }
+//delete story from API
 async function deleteStory(token, storyID) {
-	try {
-		const response = await axios.delete(`${BASE_URL}/stories/${storyID}`, {
-			params: { token: token }
-		});
-		alert(response.data.message);
-	} catch (err) {
-		alert("Unable to delete this post");
-	}
+	const response = await axios.delete(`${BASE_URL}/stories/${storyID}`, {
+		params: { token: token }
+	});
+	alert(response.data.message);
 }

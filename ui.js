@@ -150,15 +150,20 @@ $(async function() {
 		// loop through all of our stories and generate HTML for them
 		for (let story of storyList.stories) {
 			const result = generateStoryHTML(story);
-			const isFave = checkFav(currentUser.favorites, story.storyId);
-			if (isFave) {
-				result.find("span").addClass("active");
+			//changes color of favoites icon
+			try {
+				const isFave = checkFav(currentUser.favorites, story.storyId);
+				if (isFave) {
+					result.find("span").addClass("active");
+				}
+				//adds delet icon to user's posts
+				if (story.username == currentUser.username) {
+					result.find("button").removeClass("hidden");
+				}
+			} catch (error) {
+			} finally {
+				$allStoriesList.append(result);
 			}
-			console.log(story.username + currentUser.username);
-			if (story.username == currentUser.username) {
-				result.find("button").removeClass("hidden");
-			}
-			$allStoriesList.append(result);
 		}
 	}
 
@@ -249,19 +254,17 @@ $(async function() {
 		if (currentUser) {
 			localStorage.setItem("token", currentUser.loginToken);
 			localStorage.setItem("username", currentUser.username);
-			//localStorage.setItem("favorites", currentUser.favorites);
 		}
 	}
+	//creates a new story
 	$newStoryForm.on("submit", async function createNewStory(event) {
 		event.preventDefault();
 		const story = { title: $("#story-title").val(), url: $("#story-url").val() };
 		await StoryList.addStory(currentUser, story);
 		await checkIfLoggedIn();
 	});
-
+	//adds or removes favorites
 	$articles.on("click", ".flexbox", async function(event) {
-		console.log(event);
-
 		const postID = $(event.target).closest("li").attr("id");
 		const isFav = checkFav(currentUser.favorites, postID);
 		if (isFav) {
@@ -273,7 +276,7 @@ $(async function() {
 		await checkIfLoggedIn();
 		generateFavs();
 	});
-
+	//check story against user favorites
 	function checkFav(obj, id) {
 		let isFav = false;
 		for (object of obj) {
@@ -283,10 +286,14 @@ $(async function() {
 		}
 		return isFav;
 	}
-
+	//deletes posts
 	$articles.on("click", ".delete-btn", async function(event) {
 		const postID = $(event.target).closest("li").attr("id");
 		await deleteStory(currentUser.loginToken, postID);
 		await checkIfLoggedIn();
 	});
+
+	$("#profile-name").text(`Name: ${currentUser.name}`);
+	$("#profile-username").text(`Username: ${currentUser.username}`);
+	$("#profile-account-date").text(`Date created: ${currentUser.createdAt}`);
 });
