@@ -12,6 +12,7 @@ $(async function() {
 	const $newStory = $("#new-story");
 	const $favs = $("#favorited-articles");
 	const $articles = $(".articles-container");
+	const $myStoryBtn = $("#my-story-btn");
 
 	// global storyList variable
 	let storyList = null;
@@ -95,6 +96,8 @@ $(async function() {
 		hideElements();
 		await generateStories();
 		$allStoriesList.show();
+		$favs.hide();
+		$ownStories.hide();
 	});
 
 	/**
@@ -175,8 +178,9 @@ $(async function() {
 	//show user favorites
 	$("#favoritesBtn").on("click", function() {
 		generateFavs();
-		$favs.toggle();
-		$allStoriesList.toggle();
+		$favs.show();
+		$allStoriesList.hide();
+		$ownStories.hide();
 	});
 
 	//generate favorites
@@ -243,6 +247,7 @@ $(async function() {
 		$newStory.show();
 		$("#favoritesBtn").show();
 		$("#new-story-btn").show();
+		$myStoryBtn.show();
 	}
 
 	/* simple function to pull the hostname from a URL */
@@ -272,9 +277,11 @@ $(async function() {
 	$newStoryForm.on("submit", async function createNewStory(event) {
 		event.preventDefault();
 		const story = { author: $("#author").val(), title: $("#title").val(), url: $("#url").val() };
-		console.log(story);
 		await StoryList.addStory(currentUser, story);
 		await checkIfLoggedIn();
+		$("#author").val("");
+		$("#title").val("");
+		$("#url").val("");
 	});
 	//adds or removes favorites
 	$articles.on("click", ".flexbox", async function(event) {
@@ -288,6 +295,7 @@ $(async function() {
 
 		await checkIfLoggedIn();
 		generateFavs();
+		generateMyStories();
 	});
 	//check story against user favorites
 	function checkFav(obj, id) {
@@ -305,9 +313,36 @@ $(async function() {
 		await deleteStory(currentUser.loginToken, postID);
 		await checkIfLoggedIn();
 		generateFavs();
+		generateMyStories();
 	});
 
-	$("#profile-name").text(`Name: ${currentUser.name}`);
-	$("#profile-username").text(`Username: ${currentUser.username}`);
-	$("#profile-account-date").text(`Date created: ${currentUser.createdAt}`);
+	$myStoryBtn.on("click", function() {
+		generateMyStories();
+		console.log(currentUser);
+		$ownStories.show();
+		$favs.hide();
+		$allStoriesList.hide();
+	});
+	function generateMyStories() {
+		$ownStories.empty();
+		for (let story of currentUser.ownStories) {
+			const result = generateStoryHTML(story);
+			const isFave = checkFav(currentUser.favorites, story.storyId);
+			if (isFave) {
+				result.find("span").addClass("active");
+			}
+			//adds delet icon to user's posts
+			if (story.username == currentUser.username) {
+				result.find("button").removeClass("hidden");
+			}
+			$ownStories.append(result);
+		}
+	}
+	try {
+		$("#profile-name").text(`Name: ${currentUser.name}`);
+		$("#profile-username").text(`Username: ${currentUser.username}`);
+		$("#profile-account-date").text(`Date created: ${currentUser.createdAt}`);
+	} catch (error) {
+		$("#user-profile").hide();
+	}
 });
