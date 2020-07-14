@@ -294,9 +294,7 @@ $(async function() {
 			} else {
 				await User.addFavorite(currentUser, postID);
 			}
-			await checkIfLoggedIn();
-			generateFavs();
-			generateMyStories();
+			refresh();
 		} catch (error) {
 			alert("You must be logged in to add to favorites");
 		}
@@ -315,9 +313,7 @@ $(async function() {
 	$articles.on("click", ".delete-btn", async function(event) {
 		const postID = $(event.target).closest("li").attr("id");
 		await deleteStory(currentUser.loginToken, postID);
-		await checkIfLoggedIn();
-		generateFavs();
-		generateMyStories();
+		refresh();
 	});
 
 	$myStoryBtn.on("click", function() {
@@ -348,5 +344,12 @@ $(async function() {
 		$("#profile-account-date").text(`Date created: ${currentUser.createdAt}`);
 	} catch (error) {
 		$("#user-profile").hide();
+	}
+
+	//refreshing updated stories
+	async function refresh() {
+		await checkIfLoggedIn();
+		generateFavs();
+		generateMyStories();
 	}
 });
