@@ -164,22 +164,16 @@ class User {
 	}
 	//user favorite
 	static async addFavorite(user, storyID) {
-		const response = await axios.post(
-			`https://hack-or-snooze-v3.herokuapp.com/users/${user.username}/favorites/${storyID}`,
-			{
-				token: user.loginToken
-			}
-		);
-		alert(response.data.message);
+		const response = await axios.post(`${BASE_URL}/users/${user.username}/favorites/${storyID}`, {
+			token: user.loginToken
+		});
+		return response.data;
 	}
 	static async removeFavorite(user, storyID) {
-		const response = await axios.delete(
-			`https://hack-or-snooze-v3.herokuapp.com/users/${user.username}/favorites/${storyID}`,
-			{
-				params: { token: user.loginToken }
-			}
-		);
-		alert(response.data.message);
+		const response = await axios.delete(`${BASE_URL}/users/${user.username}/favorites/${storyID}`, {
+			params: { token: user.loginToken }
+		});
+		return response.data;
 	}
 }
 
